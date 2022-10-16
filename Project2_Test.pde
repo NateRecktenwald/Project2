@@ -165,18 +165,18 @@ void update(float dt){
   }
   
   //Collision detection
-//  for(int i = 0; i < rows; i++){
-//    for(int j = 0; j < cols; j++){
-//      float dist = obsticlePos.distanceTo(pos[i][j]);
-//      if(dist < obsticleRadius+0.09){
-//       Vec3 normal = (obsticlePos.minus(pos[i][j])).times(-1);
-//       normal.normalize();
-//       Vec3 bounce = normal.times(dot(vel[i][j], normal));
-//       vel[i][j].subtract(bounce.times(.5));
-//       pos[i][j].add(normal.times(.1+obsticleRadius-dist));
-//      }
-//    }
-//  }
+  for(int i = 0; i < rows; i++){
+    for(int j = 0; j < cols; j++){
+      float dist = obsticlePos.distanceTo(pos[i][j]);
+      if(dist < obsticleRadius+0.09){
+       Vec3 normal = (obsticlePos.minus(pos[i][j])).times(-1);
+       normal.normalize();
+       Vec3 bounce = normal.times(dot(vel[i][j], normal));
+       vel[i][j].subtract(bounce.times(.5));
+       pos[i][j].add(normal.times(.1+obsticleRadius-dist));
+      }
+    }
+  }
 }
 
 //Draw the scene: one sphere per mass, one line connecting each pair
