@@ -232,4 +232,17 @@ void keyPressed(){
     paused = !paused;
   if(key == 'r')
      initScene();
+   if(keyCode == RIGHT)
+     obsticlePos.x += 10;
+   if(keyCode == LEFT)
+     obsticlePos.x -= 10;
+   if(keyCode == UP)
+     obsticlePos.y -= 10;
+   if(keyCode == DOWN)
+     obsticlePos.y += 10;
+    
 }
+
+//void mouseClicked() {
+//  obsticlePos = new Vec3(mouseX, mouseY, 200);
+//}
