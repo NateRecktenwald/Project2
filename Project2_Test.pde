@@ -24,7 +24,8 @@ float kv = 1000; //TRY-IT: How big can you make kv?
 //Initial positions and velocities of masses
 int rows = 20;
 int cols = 20;
-static int maxNodes = 500;
+static int maxSize = 200;
+
 Vec3 pos[][] = new Vec3[rows+1][cols+1];
 Vec3 vel[][] = new Vec3[rows+1][cols+1];
 Vec3 acc[][] = new Vec3[rows+1][cols+1];
@@ -33,20 +34,17 @@ Vec3 acc[][] = new Vec3[rows+1][cols+1];
 Vec3 obsticlePos = new Vec3(300, 500, 200);
 float obsticleRadius = 50;
 
-
-int numNodes = 20*20;
-
 void initScene(){
   float x = 300;
   for (int i = 0; i < rows; i++){
     float z = 100;
     for(int j = 0; j < cols; j++){
-    pos[i][j] = new Vec3(x,300,z);
-    vel[i][j] = new Vec3(0,0,0);
-    z = z + 10;
+      pos[i][j] = new Vec3(x,300,z);
+      vel[i][j] = new Vec3(0,0,0);
+      z = z + (maxSize/cols);
+    }
+    x = x + (maxSize/rows);
   }
-  x = x + 10;
-}
 }
 
 void update(float dt){
@@ -168,12 +166,12 @@ void update(float dt){
   for(int i = 0; i < rows; i++){
     for(int j = 0; j < cols; j++){
       float dist = obsticlePos.distanceTo(pos[i][j]);
-      if(dist < obsticleRadius+0.09){
+      if(dist < obsticleRadius){
        Vec3 normal = (obsticlePos.minus(pos[i][j])).times(-1);
        normal.normalize();
        Vec3 bounce = normal.times(dot(vel[i][j], normal));
-       vel[i][j].subtract(bounce.times(.5));
-       pos[i][j].add(normal.times(.1+obsticleRadius-dist));
+       vel[i][j].subtract(bounce.times(2));
+       pos[i][j].add(normal.times(2+obsticleRadius-dist));
       }
     }
   }
@@ -193,7 +191,7 @@ void draw() {
     for (int j = 0; j < cols; j++) {
       pushMatrix();
       translate(pos[i][j].x,pos[i][j].y, pos[i][j].z);
-      sphere(1);
+      //sphere(1);
       popMatrix();
     }
   }
@@ -210,16 +208,29 @@ void draw() {
   //virtical lines
   for (int i = 0; i < rows-1; i++){
     for (int j = 0; j < cols; j++) {
-      line(pos[i][j].x,pos[i][j].y,pos[i][j].z,pos[i+1][j].x,pos[i+1][j].y,pos[i+1][j].z);
+      //line(pos[i][j].x,pos[i][j].y,pos[i][j].z,pos[i+1][j].x,pos[i+1][j].y,pos[i+1][j].z);
     }
   }
   
   //horizontal line
   for (int i = 0; i < rows; i++){
     for (int j = 0; j < cols-1; j++) {
-      line(pos[i][j].x,pos[i][j].y,pos[i][j].z,pos[i][j+1].x,pos[i][j+1].y,pos[i][j+1].z);
+      //line(pos[i][j].x,pos[i][j].y,pos[i][j].z,pos[i][j+1].x,pos[i][j+1].y,pos[i][j+1].z);
     }
   }
+  
+  pushMatrix();
+  noStroke();
+  fill(255,255,0);
+  for(int y = 0; y < cols-1; y++){
+    beginShape(TRIANGLE_STRIP);
+   for(int x = 0; x < rows; x++){
+       vertex(pos[x][y].x, pos[x][y].y, pos[x][y].z);
+       vertex(pos[x][y+1].x, pos[x][y+1].y, pos[x][y+1].z);
+   }
+     endShape();
+  }
+  popMatrix();
   
   if (paused)
     surface.setTitle(windowTitle + " [PAUSED]");
