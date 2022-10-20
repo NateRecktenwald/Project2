@@ -27,13 +27,31 @@
 
 
 //Create Window
+
+//camera movement variables
+//boolean moveUp = false;
+//boolean moveDown = false; 
+//boolean moveLeft = false;
+//boolean moveRight = false;
+int x = -6900;
+int y = -50;
+int z = -550;
+int eyeX = 950;
+int eyeY = 150;
+int eyeZ = -950;
+float rotX = -0.5235988;
+float rotY = -4.450589;
+float rotZ = 6.544984; 
+
 String windowTitle = "Swinging Rope";
 void setup() {
   size(2000, 1200, P3D);
   surface.setTitle(windowTitle);
   beginCamera();
-  camera(1500, 1500, 1500, 1400, 1200, 600, 1.0, 1.0, 0.0);
-  rotateX(-90);
+  camera(eyeX, eyeY, eyeZ, x, y, z, 1.0, 1.0, 0.0);
+  rotateX(rotX);
+  rotateY(rotY);
+  rotateZ(rotZ);
   endCamera();
   initScene();
 }
@@ -49,13 +67,7 @@ float mass = 1.15; //TRY-IT: How does changing mass affect resting length of the
 float k = 180; //TRY-IT: How does changing k affect resting length of the rope?
 float kv = 100; //TRY-IT: How big can you make kv?
 
-//camera movement variables
-boolean moveUp = false;
-boolean moveDown = false; 
-boolean moveLeft = false;
-boolean moveRight = false;
-int moveX = 0;
-int moveZ = 0;
+
 
 //Initial positions and velocities of masses
 static int maxNodes = 100;
@@ -151,6 +163,14 @@ void update(float dt){
   
   //camera movements
   
+  beginCamera();
+  camera(eyeX, eyeY, eyeZ, x, y, z, 1.0, 1.0, 0.0);
+  System.out.println("eyeX: " + eyeX + "  eyeY: " + eyeY + "  eyeZ: " + eyeZ + "  x: " + x + "  y: " + y + "  z: " + z);
+  rotateX(rotX);
+  rotateY(rotY);
+  rotateZ(rotZ);
+  System.out.println("rotX: " + rotX + "  rotY: " + rotY + "  rotZ: " + rotZ);
+  endCamera();
   
 }
 
@@ -158,8 +178,8 @@ void update(float dt){
 boolean paused = true;
 void draw() {
   background(255,255,255);
-  for (int i = 0; i < 40; i++) {
-    if (!paused) update(1/(40 * frameRate));
+  for (int i = 0; i < 200; i++) {
+    if (!paused) update(1/(200 * frameRate));
   }
   fill(0,0,0);
   
@@ -199,38 +219,79 @@ void keyPressed(){
     paused = !paused;
   }
   if (key == 'w') {
-    moveZ = 10;
-    moveUp = true;
+    z += 50;
   }
   if (key == 's') {
-    moveZ = -10;
-    moveDown = true;
+    z -= 50;
   }
   if (key == 'd') {
-    moveX = 10;
-    moveRight = true;
+    x += 50;
   }
   if (key == 'a') {
-    moveX = -10;
-    moveLeft = true;
+    x -= 50;
   }
+  if (key == '1') {
+    y += 50;
+  }
+  if (key == '2') {
+    y -= 50;
+  }
+    if (keyCode == UP) {
+    eyeZ += 50;
+  }
+  if (keyCode == DOWN) {
+    eyeZ -= 50;
+  }
+  if (keyCode == RIGHT) {
+    eyeX += 50;
+  }
+  if (keyCode == LEFT) {
+    eyeX -= 50;
+  }
+  if (key == '3') {
+    eyeY += 50;
+  }
+  if (key == '4') {
+    eyeY -= 50;
+  }
+  if (key == '5') {
+    rotX += PI/6;
+  }
+  if (key == '6') {
+    rotX -= PI/6;
+  }
+  if (key == '7') {
+    rotY += PI/12;
+  }
+  if (key == '8') {
+    rotY -= PI/12;
+  }
+  if (key == '9') {
+    rotZ += PI/12;
+  }
+  if (key == '0') {
+    rotZ -= PI/12;
+  }
+   
 }
 
-void keyReleased() {
-  if (key == 'w') {
-    moveZ = 0;
-    moveUp = false;
-  }
-  if (key == 's') {
-    moveZ = 0;
-    moveDown = false;
-  }
-  if (key == 'd') {
-    moveX = 0;
-    moveRight = false;
-  }
-  if (key == 'a') {
-    moveX = 0;
-    moveLeft = false;
-  }
-}
+//void keyReleased() {
+//  if (key == 'w') {
+//    z += 0;
+//  }
+//  if (key == 's') {
+//    z += 0;
+//  }
+//  if (key == 'd') {
+//    x += 0;
+//  }
+//  if (key == 'a') {
+//    x += 0;
+//  }
+//    if (key == UP) {
+//    y += 50;
+//  }
+//  if (key == DOWN) {
+//    y -= 50;
+//  }
+//}
