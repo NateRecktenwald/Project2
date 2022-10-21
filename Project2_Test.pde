@@ -44,7 +44,7 @@ float rotY = -4.450589;
 float rotZ = 6.544984; 
 
 //obsticle
-Vec3 obsticlePos = new Vec3(940, 580, 230);
+Vec3 obsticlePos = new Vec3(9940, 580, 230);
 float obsticleRadius = 50;
 
 String windowTitle = "Swinging Rope";
@@ -65,27 +65,27 @@ Vec3 gravity = new Vec3(0,400,0);
 float radius = 5;
 //Vec3 stringTop = new Vec3(500,50,50);
 float restLenY = 15;
-float restLenX = 15;
+float restLenX = 18;
 float mass = 1; //TRY-IT: How does changing mass affect resting length of the rope?
-float k = 2000; //TRY-IT: How does changing k affect resting length of the rope?
-float kv = 1000; //TRY-IT: How big can you make kv?
+float k = 2500; //TRY-IT: How does changing k affect resting length of the rope?
+float kv = 1200; //TRY-IT: How big can you make kv?
 
 
 
 //Initial positions and velocities of masses
 static int maxNodes = 100;
-Vec3 pos[][] = new Vec3[maxNodes/2][maxNodes];
-Vec3 vel[][] = new Vec3[maxNodes/2][maxNodes];
-Vec3 acc[][] = new Vec3[maxNodes/2][maxNodes];
+Vec3 pos[][] = new Vec3[maxNodes][maxNodes];
+Vec3 vel[][] = new Vec3[maxNodes][maxNodes];
+Vec3 acc[][] = new Vec3[maxNodes][maxNodes];
 
 int numNodes = 26;
 
 void initScene(){
-  for (int i = 0; i < numNodes - 5; i++){
+  for (int i = 0; i < numNodes - 1; i++){
     for (int j = 0; j < numNodes - 1; j++) {
       pos[i][j] = new Vec3(0,0,0);
-      pos[i][j].x = 1200 - (18 * j) + (15 * i);
-      pos[i][j].y = 270 + 4*i; //Make each node a little lower
+      pos[i][j].x = 1200 - (20 * j) + (15 * i);
+      pos[i][j].y = 270 - 4*i; //Make each node a little lower
       pos[i][j].z = 50 + (15 * j);
       vel[i][j] = new Vec3(0,0,0);
     }
@@ -95,16 +95,23 @@ void initScene(){
 void update(float dt){
 
   //Reset accelerations each timestep (momenum only applies to velocity)
-  for (int i = 0; i < numNodes - 5; i++){
+  for (int i = 0; i < numNodes - 1; i++){
     for (int j = 0; j < numNodes - 1; j++) {
       acc[i][j] = new Vec3(0,0,0);
       acc[i][j].add(gravity);
     }
   }
   
+   // //air drag calculation
+   //for(int i = 0; i < numNodes - 1; i++){
+   //   for(int j = 0; j < numNodes - 1; j++){
+
+   //   }
+   // }
+  
   //Compute (damped) Hooke's law for each spring
     //virtical springs
-  for (int i = 0; i < numNodes - 6; i++){
+  for (int i = 0; i < numNodes - 2; i++){
     for (int j = 0; j < numNodes - 1; j++) {
       Vec3 diffy = pos[i+1][j].minus(pos[i][j]);
       float stringFy = -k*(diffy.length() - restLenY);
@@ -118,16 +125,33 @@ void update(float dt){
       float dampFy = -kv*(projVtopy - projVboty);
       
       
-      Vec3 forcey = stringDiry.times(stringFy+dampFy);
+        Vec3 forcey;
+        if(j < numNodes - 3 && i < numNodes - 2) {
+          float dist1 = pos[i][j].distanceTo(pos[i+1][j]);
+          float dist2 = pos[j+1][j].distanceTo(pos[i][j+1]);
+          float area1 = dist1 * dist2;
+          //float beta = asin(vel[i][j].x/vel[i][j].length());
+          float constants = 0.5*1.2*0.01;
+          float airDragY = (vel[i][j].y*vel[i][j].y*area1*constants)/mass; //* cos(beta);
+          if(vel[i][j].y > 0) {
+            airDragY *= -1;
+          }
+          forcey = stringDiry.times(stringFy+dampFy+airDragY);
+         }
+         else {
+          forcey = stringDiry.times(stringFy+dampFy);
+         }
+       
+       //forcey = stringDiry.times(stringFy+dampFy);
       //System.out.println(force + "    " + stringF + "     " + dampF);
       acc[i][j].add(forcey.times(-1.0/mass));
       acc[i+1][j].add(forcey.times(1.0/mass));
       }
   }
   
-  for(int i = 0; i < numNodes - 5; i++){
+  for(int i = 0; i < numNodes - 1; i++){
     for(int j = 0; j < numNodes - 2; j++){
-          Vec3 diffx = pos[i][j + 1].minus(pos[i][j]);
+        Vec3 diffx = pos[i][j + 1].minus(pos[i][j]);
         float stringFx = -k*(diffx.length() - restLenX);
         //println(stringF,diff.length(),restLen);
         
@@ -137,9 +161,24 @@ void update(float dt){
         float projVbotx = dot(vel[i][j], stringDirx);
         float projVtopx = dot(vel[i][j+ 1], stringDirx);
         float dampFx = -kv*(projVtopx - projVbotx);
-        
-        
-        Vec3 forcex = stringDirx.times(stringFx+dampFx);
+        Vec3 forcex;
+        if(j < numNodes - 3 && i < numNodes - 2) {
+          float dist1 = pos[i][j].distanceTo(pos[i+1][j]);
+          float dist2 = pos[j+1][j].distanceTo(pos[i][j+1]);
+          float area1 = dist1 * dist2;
+          //float beta = asin(vel[i][j].x/vel[i][j].length()); 
+          float constants = 0.5*1.2*0.01;
+          float airDragX = (vel[i][j].x*vel[i][j].x*area1*constants)/mass; //* sin(beta);
+          if(vel[i][j].y > 0) {
+            airDragX *= -1;
+          }
+          forcex = stringDirx.times(stringFx+dampFx+airDragX);
+        }
+        else {
+          forcex = stringDirx.times(stringFx+dampFx);
+        }
+      
+        forcex = stringDirx.times(stringFx+dampFx);
         //System.out.println(force + "    " + stringF + "     " + dampF);
         acc[i][j].add(forcex.times(-1.0/mass));
         acc[i][j+1].add(forcex.times(1.0/mass));
@@ -149,13 +188,25 @@ void update(float dt){
   
   
   //Eulerian integration
-  for (int i = 1; i < numNodes - 5; i++){
+  //for (int i = 1; i < numNodes - 5; i++){
+  //  for (int j = 0; j < numNodes - 1; j++) {
+  //    vel[i][j].add(acc[i][j].times(dt));
+  //    pos[i][j].add(vel[i][j].times(dt));
+  //  }
+  //}
+  
+  //midpoint
+  for (int i = 1; i < numNodes - 1; i++){
     for (int j = 0; j < numNodes - 1; j++) {
-      vel[i][j].add(acc[i][j].times(dt));
-      pos[i][j].add(vel[i][j].times(dt));
+      Vec3 k1 = acc[i][j];
+      Vec3 k2 = acc[i][j].plus(k1.div(2));
+      vel[i][j].add(k2.times(dt));
+      
+      Vec3 k3 = vel[i][j];
+      Vec3 k4 = vel[i][j].plus(k3.div(2));
+      pos[i][j].add(k4.times(dt));
     }
   }
-  
   ////rk4 integration
   //for (int i = 1; i < numNodes - 5; i++){
   //  for (int j = 0; j < numNodes - 1; j++) {
@@ -194,10 +245,10 @@ void update(float dt){
   //System.out.println("rotX: " + rotX + "  rotY: " + rotY + "  rotZ: " + rotZ);
   endCamera();
   
-  System.out.println("rotX: " + obsticlePos.x + "  rotY: " + obsticlePos.y + "  rotZ: " + obsticlePos.z);
+  //System.out.println("rotX: " + obsticlePos.x + "  rotY: " + obsticlePos.y + "  rotZ: " + obsticlePos.z);
   
   //Collision detection
-  for(int i = 0; i < numNodes - 5; i++){
+  for(int i = 0; i < numNodes - 1; i++){
     for(int j = 0; j < numNodes - 1; j++){
       float dist = obsticlePos.distanceTo(pos[i][j]);
       if(dist < obsticleRadius){
@@ -210,40 +261,16 @@ void update(float dt){
     }
   }
   
+  
 }
 
 //Draw the scene: one sphere per mass, one line connecting each pair
 boolean paused = true;
 void draw() {
   background(255,255,255);
-  for (int i = 0; i < 90; i++) {
-    if (!paused) update(1/(90 * frameRate));
+  for (int i = 0; i < 200; i++) {
+    if (!paused) update(1/(200 * frameRate));
   }
-  fill(0,0,0);
-  
-  ////spheres
-  //for (int i = 0; i < numNodes - 5; i++){
-  //  for (int j = 0; j < numNodes - 2; j++) {
-  //    pushMatrix();
-  //    translate(pos[i][j].x,pos[i][j].y, pos[i][j].z);
-  //    sphere(radius);
-  //    popMatrix();
-  //  }
-  //}
-  
-  ////virtical lines
-  //for (int i = 0; i < numNodes - 6; i++){
-  //  for (int j = 0; j < numNodes - 2; j++) {
-  //    line(pos[i][j].x,pos[i][j].y,pos[i][j].z,pos[i+1][j].x,pos[i+1][j].y,pos[i+1][j].z);
-  //  }
-  //}
-  
-  ////horizontal line
-  //for (int i = 0; i < numNodes - 5; i++){
-  //  for (int j = 0; j < numNodes - 3; j++) {
-  //    line(pos[i][j].x,pos[i][j].y,pos[i][j].z,pos[i][j+1].x,pos[i][j+1].y,pos[i][j+1].z);
-  //  }
-  //}
   
   pushMatrix();
   noStroke();
@@ -257,7 +284,7 @@ void draw() {
   pushMatrix();
   noStroke();
 
-  for(int y = 0; y < numNodes - 6; y++){
+  for(int y = 0; y < numNodes - 2; y++){
      beginShape(TRIANGLE_STRIP);
      fill(0,150,100 + y * 10);
    for(int x = 0; x < numNodes - 1; x++){
