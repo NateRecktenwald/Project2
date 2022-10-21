@@ -53,6 +53,10 @@ public class Vec3 {
     z *= rhs;
   }
   
+  public Vec3 div(float rhs){
+    return new Vec3(x/rhs, y/rhs, z/rhs);
+  }
+  
   public void clampToLength(float maxL){
     float magnitude = sqrt(x*x + y*y + z*z);
     if (magnitude > maxL){
