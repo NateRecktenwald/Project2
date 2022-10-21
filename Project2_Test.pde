@@ -153,14 +153,14 @@ void update(float dt){
   }
   
   //Collision detection and response
-  for (int i = 0; i < rows; i++){
-    for (int j = 0; j < cols; j++) {
-      if (pos[i][j].y+radius > floor){
-        vel[i][j].y *= -.9;
-        pos[i][j].y = floor - radius;
-      }
-    }
-  }
+  //for (int i = 0; i < rows; i++){
+  //  for (int j = 0; j < cols; j++) {
+  //    if (pos[i][j].y+radius > floor){
+  //      vel[i][j].y *= -.9;
+  //      pos[i][j].y = floor - radius;
+  //    }
+  //  }
+  //}
   
   //Collision detection
   for(int i = 0; i < rows; i++){
@@ -219,6 +219,8 @@ void draw() {
     }
   }
   
+
+  
   pushMatrix();
   noStroke();
   fill(255,255,0);
@@ -227,6 +229,9 @@ void draw() {
    for(int x = 0; x < rows; x++){
        vertex(pos[x][y].x, pos[x][y].y, pos[x][y].z);
        vertex(pos[x][y+1].x, pos[x][y+1].y, pos[x][y+1].z);
+       
+       normal(pos[x][y].x, pos[x][y].y, pos[x][y].z);
+       normal(pos[x][y+1].x, pos[x][y+1].y, pos[x][y+1].z);
    }
      endShape();
   }
